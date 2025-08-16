@@ -1,0 +1,90 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  name: openshift-gitops-gitopscluster
+  namespace: acm-gitops-policy
+  annotations:
+    policy.open-cluster-management.io/standards: NIST-CSF
+    policy.open-cluster-management.io/categories: PR.DS Data Security
+    policy.open-cluster-management.io/controls: PR.DS-1 Data-at-rest
+spec:
+  remediationAction: enforce
+  disabled: false
+  policy-templates:
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: openshift-gitops-gitopscluster
+        spec:
+          remediationAction: enforce
+          severity: medium
+          namespaceSelector:
+            exclude:
+              - kube-*
+            include:
+              - default
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: cluster.open-cluster-management.io/v1beta2
+                kind: ManagedClusterSetBinding
+                metadata:
+                  name: default
+                  namespace: blueargocd
+                spec:
+                  clusterSet: default
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: cluster.open-cluster-management.io/v1beta1
+                kind: Placement
+                metadata:
+                  name: openshift-gitops-placement
+                  namespace: blueargocd
+                spec:
+                  clusterSets:
+                    - default
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: apps.open-cluster-management.io/v1beta1
+                kind: GitOpsCluster
+                metadata:
+                  name: openshift-gitops-gitops
+                  namespace: default
+                spec:
+                  argoServer:
+                    cluster: local-cluster
+                    argoNamespace: blueargocd
+                  placementRef:
+                    name: openshift-gitops-placement
+                    namespace: default
+                    kind: Placement
+                    apiVersion: cluster.open-cluster-management.io/v1beta1
+---
+apiVersion: apps.open-cluster-management.io/v1
+kind: PlacementRule
+metadata:
+  name: openshift-gitops-gitopscluster-placement
+  namespace: acm-gitops-policy
+spec:
+  clusterSelector:
+    matchExpressions:
+      - key: cluster.open-cluster-management.io/clusterset
+        operator: In
+        values:
+          - default
+  clusterConditions: []
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  name: openshift-gitops-gitopscluster-placement
+  namespace: acm-gitops-policy
+placementRef:
+  name: openshift-gitops-gitopscluster-placement
+  kind: PlacementRule
+  apiGroup: apps.open-cluster-management.io
+subjects:
+  - name: openshift-gitops-gitopscluster
+    kind: Policy
+    apiGroup: policy.open-cluster-management.io
