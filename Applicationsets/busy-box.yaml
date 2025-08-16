@@ -9,7 +9,7 @@ spec:
   resources:
     requests:
       storage: 1Gi
-  storageClassName: nfs  # or any RWX-capable storage class in your cluster
+  storageClassName: ocs-storagecluster-ceph-rbd  # or any RWX-capable storage class in your cluster
 
 ---
 apiVersion: apps/v1
@@ -29,7 +29,7 @@ spec:
       containers:
       - name: busybox
         image: busybox
-        command: ["sh", "-c", "while true; do echo $(date) >> /data/log.txt; sleep 5; done"]
+        command: ["sh", "-c", "while true; do echo $(date) - $(hostname) >> /data/log.txt; sleep 5; done"]
         volumeMounts:
         - name: shared-storage
           mountPath: /data
