@@ -1,1 +1,1 @@
-# Basic-ArgoCD-ACM-demo
+# basic-argoCD-acm-demo
