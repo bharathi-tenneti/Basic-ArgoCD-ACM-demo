@@ -1,0 +1,38 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: busybox-rwx
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: busybox-rwx
+  template:
+    metadata:
+      labels:
+        app: busybox-rwx
+    spec:
+      containers:
+      - name: busybox
+        image: busybox
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        command: ["/bin/sh"]
+        args:
+        - -c
+        - |
+          while true; do
+            echo "$(date) - ${POD_NAME}" >> /data/log.txt
+            sleep 5
+          done
+        volumeMounts:
+        - name: shared-storage
+          mountPath: /data
+      volumes:
+      - name: shared-storage
+        persistentVolumeClaim:
+          claimName: rwx-pvc
