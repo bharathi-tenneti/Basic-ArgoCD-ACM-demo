@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: parksmap-application-set
+  namespace: openshift-gitops
+spec:
+  generators:
+    - clusters:
+        selector:
+          matchLabels:
+            argocd.argoproj.io/secret-type: cluster
+            cluster.open-cluster-management.io/clusterset: managedset
+        values:
+          revision: main
+  template:
+    metadata:
+      name: parksmap-{{name}}
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/bharathi-tenneti/basic-argoCD-acm-demo.git
+        targetRevision: "{{values.revision}}"
+        path: appset/manifests
+      destination:
+        namespace: parksmap
+        server: "{{server}}"
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
+        automated:
+          selfHeal: true
