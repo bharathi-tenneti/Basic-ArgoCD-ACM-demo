@@ -9,9 +9,9 @@ spec:
         generators:
           - list:
               elements:
-                - name: parksmap
+                - app: parksmap
                   path: appset/manifests/parksmap
-                - name: busybox
+                - app: busybox
                   path: appset/manifests/busybox
           - clusters:
               selector:
@@ -22,7 +22,7 @@ spec:
                 revision: dev
   template:
     metadata:
-      name: "{{name}}-{{clusterName}}"
+      name: "{{app}}-{{name}}"  
     spec:
       project: default
       source:
@@ -30,7 +30,7 @@ spec:
         targetRevision: "{{values.revision}}"
         path: "{{path}}"
       destination:
-        namespace: "{{name}}"
+        namespace: "{{app}}"  
         server: "{{server}}"
       syncPolicy:
         syncOptions:
