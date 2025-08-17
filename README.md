@@ -18,6 +18,7 @@ oc create -f gitops-rbac.yaml
 ```
 oc create -f appset/parksmap-appset.yaml
 ```
+![image](image/parksmap.png)
 
 ### Create busy box application using ACM GUI. 
 This should create busy box deployment with 2 pods writing to a shared location. Make sure to pick the placement "gitops-clusters"
