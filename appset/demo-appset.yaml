@@ -5,12 +5,21 @@ metadata:
   namespace: openshift-gitops
 spec:
   generators:
-    - list:
-        elements:
-          - name: parksmap
-            path: appset/manifests/parksmap
-          - name: busybox
-            path: appset/manifests/busybox
+    - matrix:
+        generators:
+          - list:
+              elements:
+                - name: parksmap
+                  path: appset/manifests/parksmap
+                - name: busybox
+                  path: appset/manifests/busybox
+          - clusters:
+              selector:
+                matchLabels:
+                  argocd.argoproj.io/secret-type: cluster
+                  cluster.open-cluster-management.io/clusterset: default
+              values:
+                revision: dev
   template:
     metadata:
       name: "{{name}}-{{clusterName}}"
@@ -18,11 +27,11 @@ spec:
       project: default
       source:
         repoURL: https://github.com/bharathi-tenneti/basic-argoCD-acm-demo.git
-        targetRevision: HEAD
+        targetRevision: "{{values.revision}}"
         path: "{{path}}"
       destination:
         namespace: "{{name}}"
-        server: "{{server}}" # Retain the server from the Cluster Generator if you're using ACM
+        server: "{{server}}"
       syncPolicy:
         syncOptions:
           - CreateNamespace=true
