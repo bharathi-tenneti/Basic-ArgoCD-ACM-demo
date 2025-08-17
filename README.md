@@ -2,35 +2,32 @@
 
 This example show how to integrate RedHat Openshift Gitops with Advanced Cluster Management(ACM).
 
-## Pre-Reqs:
+# Pre-Reqs:
 
 1. Running Openshift cluster, and oc cli.
 2. Install ODF, ACM, and Gitops Operators.
 
-## Create Gitops-ACM integration, and necessary RBACs
+# Create Gitops-ACM integration, and necessary RBACs
 
 ```
 oc create -f gitops-acm-integration.yaml
 oc create -f gitops-rbac.yaml
 ```
 
-### To create application using ApplicationSet from CLI. This should create parksmap application in a clusterset with name "managedset".
+# To create application using ApplicationSet from CLI. This should create parksmap, and busybox applications in the default "local-cluster", when using ACM. They each will be deployed in their own project "busybox", and "parksmap"
 ```
-oc create -f appset/parksmap-appset.yaml
+oc create -f appset/demo-appset.yaml
 ```
-![image](image/parksmap.png)
 
-### Create busy box application using ACM GUI. 
-This should create busy box deployment with 2 pods writing to a shared location. Make sure to pick the placement "gitops-clusters"
-And from ACM GUI , provide below values:
-git repo URL: "https://github.com/bharathi-tenneti/basic-argoCD-acm-demo.git"
-path: apps
+# To create full stack application with frontenc, backend, and a mariadb database in an ACM clusterset = "managedset" 
+This should create three components, quotesweb(frontend), quotd-python(backend), quotessql(mariadb) all in the "mariadb-{{cluster}}" namespace.
 
-![image](image/appset-placement.png)
+```
+oc create if appset/mariadb-appset.yaml
+```
+You can refer to below git repos for source code, and sql scripts to polulate database.
+https://github.com/bharathi-tenneti/qotd-python
+https://github.com/bharathi-tenneti/quotemysql
+https://github.com/bharathi-tenneti/quotesweb
 
 
-### Based on the placements that we created , busy box application should be created into all clusters falling under "global" clusterset.
-
-![image](image/argocd.png)
-
-![image](image/acm.png)
