@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: demo-app-set
+  namespace: openshift-gitops
+spec:
+  generators:
+    - list:
+        elements:
+          - name: parksmap
+            path: appset/manifests/parksmap
+          - name: busybox
+            path: appset/manifests/busybox
+  template:
+    metadata:
+      name: "{{name}}-{{clusterName}}"
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/bharathi-tenneti/basic-argoCD-acm-demo.git
+        targetRevision: HEAD
+        path: "{{path}}"
+      destination:
+        namespace: "{{name}}"
+        server: "{{server}}" # Retain the server from the Cluster Generator if you're using ACM
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
+        automated:
+          selfHeal: true

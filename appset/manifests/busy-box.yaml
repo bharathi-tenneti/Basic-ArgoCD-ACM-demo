@@ -1,0 +1,39 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rwx-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: ocs-storagecluster-cephfs  # or any RWX-capable storage class in your cluster
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: busybox-rwx
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: busybox-rwx
+  template:
+    metadata:
+      labels:
+        app: busybox-rwx
+    spec:
+      containers:
+      - name: busybox
+        image: busybox
+        command: ["sh", "-c", "while true; do echo $(date) - $(hostname) >> /data/log.txt; sleep 5; done"]
+        volumeMounts:
+        - name: shared-storage
+          mountPath: /data
+      volumes:
+      - name: shared-storage
+        persistentVolumeClaim:
+          claimName: rwx-pvc
