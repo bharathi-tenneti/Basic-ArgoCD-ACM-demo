@@ -9,8 +9,7 @@ spec:
   resources:
     requests:
       storage: 1Gi
-  storageClassName: ocs-storagecluster-ceph-rbd  # or any RWX-capable storage class in your cluster
-  volumeMode: Block
+  storageClassName: ocs-storagecluster-cephfs  # or any RWX-capable storage class in your cluster
 
 ---
 apiVersion: apps/v1
