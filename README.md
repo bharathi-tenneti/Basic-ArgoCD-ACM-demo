@@ -6,6 +6,7 @@ This example show how to integrate RedHat Openshift Gitops with Advanced Cluster
 
 1. Running Openshift cluster, and oc cli.
 2. Install ODF, ACM, and Gitops Operators.
+_Note: ODF is optional, one of the app=busybox is using cbd storageclass. You can switch to any other compatible storage class in teh yaml file._
 
 # Create Gitops-ACM integration, and necessary RBACs
 
