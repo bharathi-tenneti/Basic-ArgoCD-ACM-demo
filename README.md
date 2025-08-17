@@ -24,7 +24,7 @@ oc create -f appset/demo-appset.yaml
 This should create three components, quotesweb(frontend), quotd-python(backend), quotessql(mariadb) all in the "mariadb-{{cluster}}" namespace.
 
 ```
-oc create if appset/mariadb-appset.yaml
+oc create -f appset/mariadb-appset.yaml
 ```
 You can refer to below git repos for source code, and sql scripts to polulate database.
 https://github.com/bharathi-tenneti/qotd-python
