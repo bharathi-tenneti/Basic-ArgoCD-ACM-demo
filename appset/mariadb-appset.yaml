@@ -1,0 +1,48 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: mariadb-app-set
+  namespace: openshift-gitops
+spec:
+  generators:
+    - matrix:
+        generators:
+          # This list generator defines the individual components of the MariaDB app.
+          - list:
+              elements:
+                - component: quotd-python
+                  path: appset/manifests/mariadb/quotd-python
+                - component: quotessql
+                  path: appset/manifests/mariadb/quotessql
+                - component: quotesweb
+                  path: appset/manifests/mariadb/quotesweb
+          
+          # This clusters generator finds the target clusters.
+          - clusters:
+              selector:
+                matchLabels:
+                  argocd.argoproj.io/secret-type: cluster
+                  cluster.open-cluster-management.io/clusterset: managedset
+              values:
+                revision: dev
+  template:
+    metadata:
+      # Each component gets a unique Application name for tracking.
+      name: "mariadb-{{component}}-{{name}}"
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/bharathi-tenneti/basic-argoCD-acm-demo.git
+        targetRevision: "{{values.revision}}"
+        # The path is templated, pointing to the specific component's directory.
+        path: "{{path}}"
+      destination:
+        # All three components will be deployed to the same namespace,
+        # named after the application and the cluster.
+        namespace: "mariadb-{{name}}"
+        server: "{{server}}"
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
+        automated:
+          selfHeal: true
