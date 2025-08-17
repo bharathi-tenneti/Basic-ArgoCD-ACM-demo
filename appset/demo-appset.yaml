@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: demo-app-set
+  namespace: openshift-gitops
+spec:
+  generators:
+    - matrix:
+        generators:
+          - list:
+              elements:
+                - app: parksmap
+                  path: appset/manifests/parksmap
+                - app: busybox
+                  path: appset/manifests/busybox
+          - clusters:
+              selector:
+                matchLabels:
+                  argocd.argoproj.io/secret-type: cluster
+                  cluster.open-cluster-management.io/clusterset: default
+              values:
+                revision: dev
+  template:
+    metadata:
+      name: "{{app}}-{{name}}"  
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/bharathi-tenneti/basic-argoCD-acm-demo.git
+        targetRevision: "{{values.revision}}"
+        path: "{{path}}"
+      destination:
+        namespace: "{{app}}"  
+        server: "{{server}}"
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
+        automated:
+          selfHeal: true
