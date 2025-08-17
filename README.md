@@ -14,7 +14,16 @@ oc create -f gitops-acm-integration.yaml
 oc create -f gitops-rbac.yaml
 ```
 
-### Create busy box application. This should create busy box deployment with 2 pods writing to a shared location. Make sure to pick the placement "gitops-clusters"
+### To create application using ApplicationSet from CLI. This should create parksmap application in a clusterset with name "managedset".
+```
+oc create -f appset/parksmap-appset.yaml
+```
+
+### Create busy box application using ACM GUI. 
+This should create busy box deployment with 2 pods writing to a shared location. Make sure to pick the placement "gitops-clusters"
+And from ACM GUI , provide below values:
+git repo URL: "https://github.com/bharathi-tenneti/basic-argoCD-acm-demo.git"
+path: apps
 
 ![image](image/appset-placement.png)
 
