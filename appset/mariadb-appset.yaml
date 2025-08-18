@@ -24,7 +24,7 @@ spec:
                   argocd.argoproj.io/secret-type: cluster
                   cluster.open-cluster-management.io/clusterset: managedset
               values:
-                revision: dev
+                revision: main
   template:
     metadata:
       # Each component gets a unique Application name for tracking.
